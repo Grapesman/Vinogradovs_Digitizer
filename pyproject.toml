@@ -1,0 +1,40 @@
+[project]
+name = "vinogradovs-digitizer"
+version = "2.3.0"
+description = "Desktop OpenCV/PySide6 digitizer for geophysical log chart images"
+requires-python = ">=3.11,<3.13"
+
+dependencies = [
+    "PySide6>=6.7,<7",
+    "opencv-python-headless>=4.9,<5",
+    "numpy>=1.26,<3",
+    "pandas>=2.2,<3",
+    "openpyxl>=3.1,<4",
+]
+
+
+[tool.pytest.ini_options]
+
+minversion = "8.0"
+
+testpaths = [
+    "tests",
+]
+
+python_files = [
+    "test_*.py",
+]
+
+python_functions = [
+    "test_*",
+]
+
+pythonpath = [
+    ".",
+]
+
+addopts = [
+    "-ra",
+    "--strict-config",
+    "--strict-markers",
+]

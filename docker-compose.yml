@@ -1,0 +1,43 @@
+services:
+  vinogradovs-digitizer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    environment:
+      VNC_RESOLUTION: "1600x860"
+      VINOGRADOVS_DATA_DIR: /data
+      VINOGRADOVS_HOST_HOME: /host/home
+      VINOGRADOVS_HOST_VOLUMES: /host/volumes
+      VINOGRADOVS_FULLSCREEN: "1"
+      VINOGRADOVS_MAXIMIZED: "1"
+
+      # В Docker заставку показывает HTML.
+      # В будущей Windows EXE её будет показывать Python.
+      VINOGRADOVS_SPLASH_MS: "0"
+
+    ports:
+      - "127.0.0.1:6080:6080"
+
+    volumes:
+      # Служебная папка проекта остаётся доступной для совместимости.
+      - ./data:/data
+
+      # DEV-режим: исходники подключаются напрямую.
+      - ./main.py:/app/main.py:ro
+      - ./digitizer:/app/digitizer:ro
+      - ./assets:/app/assets:ro
+
+      # Браузерная оболочка noVNC.
+      - ./docker-novnc-index.html:/usr/share/novnc/index.html:ro
+      - ./assets/app_icon.png:/usr/share/novnc/vinogradovs-icon.png:ro
+
+      # Доступ к обычным папкам пользователя macOS во время Docker-тестирования:
+      # Desktop, Documents, Downloads, Pictures и т.д.
+      - ${HOME}:/host/home
+
+      # Подключённые внешние диски macOS.
+      # Docker Desktop может запросить разрешение на доступ к /Volumes.
+      - /Volumes:/host/volumes
+
+    restart: unless-stopped

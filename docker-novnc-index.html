@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover"
+    >
+
+    <!-- Не кэшировать старую версию интерфейса -->
+    <meta
+        http-equiv="Cache-Control"
+        content="no-cache, no-store, must-revalidate"
+    >
+    <meta
+        http-equiv="Pragma"
+        content="no-cache"
+    >
+    <meta
+        http-equiv="Expires"
+        content="0"
+    >
+
+    <title>Vinogradov's Digitizer</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="/vinogradovs-icon.png"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+
+            margin: 0;
+            padding: 0;
+
+            overflow: hidden;
+
+            background: #07131f;
+        }
+
+
+        /* =========================================================
+           ОСНОВНОЕ ОКНО noVNC
+           ========================================================= */
+
+        #desktop {
+            position: fixed;
+
+            inset: 0;
+
+            width: 100vw;
+            height: 100vh;
+
+            margin: 0;
+            padding: 0;
+
+            border: 0;
+            outline: 0;
+
+            background: #ffffff;
+
+            opacity: 0;
+
+            transition:
+                opacity 0.28s ease;
+        }
+
+
+        #desktop.visible {
+            opacity: 1;
+        }
+
+
+        /* =========================================================
+           ЗАСТАВКА
+           ========================================================= */
+
+        #splash {
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 9999;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 24px;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 50% 40%,
+                    #173d60 0%,
+                    #0d2137 54%,
+                    #07131f 100%
+                );
+
+            transition:
+                opacity 0.42s ease,
+                visibility 0.42s ease;
+        }
+
+
+        #splash.hide {
+            opacity: 0;
+            visibility: hidden;
+
+            pointer-events: none;
+        }
+
+
+        .splash-content {
+            width: 100%;
+            max-width: 900px;
+
+            text-align: center;
+        }
+
+
+        /* =========================================================
+           ГЕРБ
+           ========================================================= */
+
+        .crest {
+            display: block;
+
+            width: min(520px, 52vh, 72vw);
+            height: min(520px, 52vh, 72vw);
+
+            margin: 0 auto;
+
+            object-fit: contain;
+
+            user-select: none;
+
+            -webkit-user-drag: none;
+
+            filter:
+                drop-shadow(
+                    0 22px 45px
+                    rgba(0, 0, 0, 0.38)
+                );
+        }
+
+
+        /* =========================================================
+           ПРИВЕТСТВИЕ
+           ========================================================= */
+
+        .welcome {
+            margin-top: 14px;
+
+            padding: 0 16px;
+
+            color: #ffffff;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            font-size:
+                clamp(
+                    24px,
+                    3vw,
+                    40px
+                );
+
+            line-height: 1.2;
+
+            font-weight: 750;
+
+            letter-spacing: -0.02em;
+        }
+
+
+        /* =========================================================
+           ТЕКСТ ЗАГРУЗКИ
+           ========================================================= */
+
+        .loading-text {
+            margin-top: 18px;
+
+            color: #e5c57c;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            font-size: 15px;
+
+            line-height: 1.4;
+
+            font-weight: 650;
+        }
+
+
+        /* =========================================================
+           ПОЛОСА ЗАГРУЗКИ
+           ========================================================= */
+
+        .progress {
+            position: relative;
+
+            width: min(
+                420px,
+                62vw
+            );
+
+            height: 5px;
+
+            margin:
+                18px
+                auto
+                0;
+
+            overflow: hidden;
+
+            border-radius: 100px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.13
+                );
+        }
+
+
+        .progress-bar {
+            width: 35%;
+            height: 100%;
+
+            border-radius: 100px;
+
+            background: #e4c477;
+
+            box-shadow:
+                0 0 12px
+                rgba(
+                    228,
+                    196,
+                    119,
+                    0.35
+                );
+
+            animation:
+                progress-animation
+                1s
+                ease-in-out
+                infinite;
+        }
+
+
+        @keyframes progress-animation {
+
+            0% {
+                transform:
+                    translateX(
+                        -110%
+                    );
+            }
+
+            100% {
+                transform:
+                    translateX(
+                        390%
+                    );
+            }
+        }
+
+
+        /* =========================================================
+           МАЛЕНЬКИЕ ЭКРАНЫ
+           ========================================================= */
+
+        @media (
+            max-width: 700px
+        ) {
+
+            #splash {
+                padding: 16px;
+            }
+
+
+            .crest {
+                width: min(
+                    390px,
+                    49vh,
+                    78vw
+                );
+
+                height: min(
+                    390px,
+                    49vh,
+                    78vw
+                );
+            }
+
+
+            .welcome {
+                margin-top: 10px;
+            }
+
+
+            .loading-text {
+                margin-top: 14px;
+
+                font-size: 14px;
+            }
+
+
+            .progress {
+                margin-top: 15px;
+            }
+        }
+
+
+        /* =========================================================
+           ОТКЛЮЧЕНИЕ АНИМАЦИИ ПРИ СООТВЕТСТВУЮЩЕЙ
+           СИСТЕМНОЙ НАСТРОЙКЕ
+           ========================================================= */
+
+        @media (
+            prefers-reduced-motion: reduce
+        ) {
+
+            #desktop,
+            #splash {
+                transition: none;
+            }
+
+
+            .progress-bar {
+                animation-duration: 2s;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!-- =========================================================
+         ЗАСТАВКА
+
+         Показывается только при запуске Docker-версии.
+         После загрузки удаляется из DOM полностью.
+         ========================================================= -->
+
+    <div id="splash">
+
+        <div class="splash-content">
+
+            <img
+                class="crest"
+                src="/vinogradovs-icon.png"
+                alt="Герб Vinogradov's Digitizer"
+                draggable="false"
+            >
+
+            <div class="welcome">
+                Добро пожаловать в дигитайзер Виноградова
+            </div>
+
+            <div class="loading-text">
+                Загрузка Digitizer Vinogradov…
+            </div>
+
+            <div
+                class="progress"
+                aria-hidden="true"
+            >
+                <div
+                    class="progress-bar"
+                ></div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         noVNC
+
+         После заставки это единственный элемент,
+         занимающий рабочую область браузера.
+
+         Никакой второй шапки или внешней рамки нет.
+         ========================================================= -->
+
+    <iframe
+        id="desktop"
+        src="/vnc.html?autoconnect=1&resize=scale&reconnect=1&show_dot=false"
+        title="Vinogradov's Digitizer"
+        allow="fullscreen"
+    ></iframe>
+
+
+    <script>
+        "use strict";
+
+
+        const splash =
+            document.getElementById(
+                "splash"
+            );
+
+
+        const desktop =
+            document.getElementById(
+                "desktop"
+            );
+
+
+        let splashRemoved = false;
+
+
+        /*
+         * Показываем рабочее окно.
+         */
+        function showDesktop() {
+
+            if (
+                splashRemoved
+            ) {
+                return;
+            }
+
+
+            splashRemoved = true;
+
+
+            desktop.classList.add(
+                "visible"
+            );
+
+
+            splash.classList.add(
+                "hide"
+            );
+
+
+            /*
+             * После завершения fade-out заставка
+             * удаляется полностью.
+             */
+            window.setTimeout(
+                () => {
+
+                    if (
+                        splash
+                        && splash.parentNode
+                    ) {
+                        splash.remove();
+                    }
+
+                },
+                460
+            );
+        }
+
+
+        /*
+         * Даём noVNC загрузиться в фоне.
+         *
+         * Заставка остаётся примерно 3.8 секунды,
+         * чтобы пользователь успел увидеть герб
+         * и текст приветствия.
+         */
+        window.setTimeout(
+            showDesktop,
+            3800
+        );
+
+
+        /*
+         * Если iframe уже полностью загрузился,
+         * всё равно не убираем заставку мгновенно:
+         * минимальное время показа контролируется
+         * таймером выше.
+         */
+        desktop.addEventListener(
+            "load",
+            () => {
+                /*
+                 * Нам здесь ничего дополнительно
+                 * делать не нужно.
+                 *
+                 * Обработчик оставлен явно,
+                 * чтобы браузер не воспринимал
+                 * iframe как неиспользуемый ресурс.
+                 */
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

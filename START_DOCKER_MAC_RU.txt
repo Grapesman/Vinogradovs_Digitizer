@@ -1,0 +1,23 @@
+VINOGRADOVS DIGITIZER 2.3.0 — ЗАПУСК НА MAC
+
+1. Запусти Docker Desktop.
+2. Положи фотографию в папку data.
+3. Если запущен старый контейнер: docker rm -f vinogradovs-digitizer
+   Перейди в распакованную НОВУЮ папку проекта.
+4. Выполни:
+
+   docker compose up --build -d
+
+5. Открой в браузере:
+
+   http://localhost:6080/
+
+6. В программе: Файл -> Открыть изображение.
+7. Выбери файл из /data.
+8. Excel сохраняй в /data — он появится в папке data на Mac.
+
+ОСТАНОВКА:
+   docker compose down
+
+ПОВТОРНЫЙ ЗАПУСК БЕЗ ПЕРЕСБОРКИ:
+   docker compose up -d

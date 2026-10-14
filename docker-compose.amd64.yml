@@ -1,0 +1,3 @@
+services:
+  vinogradovs-digitizer:
+    platform: linux/amd64

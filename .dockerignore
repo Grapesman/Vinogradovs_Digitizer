@@ -1,0 +1,76 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Tests cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Build / packaging
+build/
+dist/
+*.spec
+*.egg-info/
+
+# Windows packaging
+Output/
+installer_output/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*~
+
+# User-generated data
+# Содержимое data подключается отдельным volume
+data/*
+
+# Excel / project results accidentally left in project root
+*.xlsx
+*.xls
+
+# Archives
+*.zip
+*.rar
+*.7z
+
+# Keep project source files even if patterns above change later
+!requirements.txt
+!Dockerfile
+!docker-compose.yml
+!docker-compose.amd64.yml
+!docker-entrypoint.sh
+!docker-novnc-index.html
+!main.py
+!digitizer/
+!digitizer/**
+!assets/
+!assets/**
+!tests/
+!tests/**

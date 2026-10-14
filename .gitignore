@@ -1,0 +1,145 @@
+# ------------------------------------------------------------
+# Python
+# ------------------------------------------------------------
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ------------------------------------------------------------
+# Virtual environments
+# ------------------------------------------------------------
+
+.venv/
+.venv-build/
+venv/
+env/
+ENV/
+
+# ------------------------------------------------------------
+# PyInstaller
+# ------------------------------------------------------------
+
+build/
+dist/
+*.spec.bak
+
+# ------------------------------------------------------------
+# Windows release output
+# ------------------------------------------------------------
+
+release/
+Output/
+installer_output/
+
+# ------------------------------------------------------------
+# User-generated application data
+# ------------------------------------------------------------
+
+data/
+
+*.xlsx
+*.xls
+
+# Vinogradov's Digitizer project files
+*.vdigit.json
+*_working.png
+
+# ------------------------------------------------------------
+# IDE / editors
+# ------------------------------------------------------------
+
+.idea/
+.vscode/
+
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.temp
+
+# ------------------------------------------------------------
+# macOS
+# ------------------------------------------------------------
+
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ------------------------------------------------------------
+# Windows
+# ------------------------------------------------------------
+
+Thumbs.db
+Desktop.ini
+
+# ------------------------------------------------------------
+# Logs
+# ------------------------------------------------------------
+
+*.log
+
+# ------------------------------------------------------------
+# Archives
+# ------------------------------------------------------------
+
+*.zip
+*.rar
+*.7z
+
+# ------------------------------------------------------------
+# Local environment / secrets
+# ------------------------------------------------------------
+
+.env
+.env.*
+!.env.example
+
+# ------------------------------------------------------------
+# Keep important project files
+# ------------------------------------------------------------
+
+!VinogradovsDigitizer.spec
+!requirements.txt
+!requirements-build.txt
+!pyproject.toml
+!Dockerfile
+!docker-compose.yml
+!docker-compose.amd64.yml
+!docker-entrypoint.sh
+!docker-novnc-index.html
+!docker_smoke_test.sh
+!build_windows_exe.bat
+!build_windows_installer.bat
+!build_windows_release.bat
+
+!digitizer/
+!digitizer/**
+
+!assets/
+!assets/**
+
+!tests/
+!tests/**
+
+!windows/
+!windows/**
+
+!installer/
+!installer/**
+
+!.github/
+!.github/**
+# Final Python cache override
+__pycache__/
+**/__pycache__/
+*.py[cod]
