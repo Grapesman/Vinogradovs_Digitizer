@@ -100,18 +100,104 @@ RECOMMENDED_CURVE_DEFAULTS = {
 CONTROL_PANEL_WIDTH = 500
 
 
-class NoWheelSpinBox(QSpinBox):
-    """Numeric control that never changes while the user scrolls the panel."""
+class _NumericParameterEdit(QLineEdit):
+    """QLineEdit-based numeric editor used for recognition parameters.
+
+    We intentionally do not use QSpinBox/QDoubleSpinBox here. On Windows the
+    embedded line edit of a styled spin box can be clipped by Qt when display
+    scaling is enabled, which makes the numeric value look completely blank.
+    A direct QLineEdit has no nested editor, so the value is rendered reliably
+    on Windows, macOS and Linux while keeping the same public API we need.
+    """
+
+    def __init__(self, *, integer: bool, parent=None):
+        super().__init__(parent)
+        self._integer = integer
+        self._minimum = -2147483648 if integer else -1.0e100
+        self._maximum = 2147483647 if integer else 1.0e100
+        self._decimals = 0 if integer else 2
+        self._single_step = 1.0
+        self._last_valid_value = 0 if integer else 0.0
+
+        self.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.setClearButtonEnabled(False)
+        self.editingFinished.connect(self._normalize_text)
+        self.setValue(self._last_valid_value)
+
+    def setRange(self, minimum, maximum) -> None:
+        self._minimum = int(minimum) if self._integer else float(minimum)
+        self._maximum = int(maximum) if self._integer else float(maximum)
+        if self._minimum > self._maximum:
+            self._minimum, self._maximum = self._maximum, self._minimum
+        self.setValue(self._last_valid_value)
+
+    def setDecimals(self, decimals: int) -> None:
+        if self._integer:
+            return
+        self._decimals = max(0, int(decimals))
+        self.setValue(self._last_valid_value)
+
+    def setSingleStep(self, step) -> None:
+        self._single_step = max(0.0, float(step))
+
+    def setButtonSymbols(self, _symbols) -> None:
+        # Compatibility with the old QAbstractSpinBox-based implementation.
+        pass
+
+    def value(self):
+        raw = self.text().strip().replace(" ", "").replace(",", ".")
+        try:
+            parsed = int(float(raw)) if self._integer else float(raw)
+        except (TypeError, ValueError):
+            parsed = self._last_valid_value
+
+        parsed = max(self._minimum, min(self._maximum, parsed))
+        return int(parsed) if self._integer else float(parsed)
+
+    def setValue(self, value) -> None:
+        value = int(round(float(value))) if self._integer else float(value)
+        value = max(self._minimum, min(self._maximum, value))
+        self._last_valid_value = int(value) if self._integer else float(value)
+
+        if self._integer:
+            text = str(int(value))
+        else:
+            text = f"{float(value):.{self._decimals}f}"
+        self.setText(text)
+
+    def _normalize_text(self) -> None:
+        self.setValue(self.value())
+
+    def set_locked_appearance(self, locked: bool) -> None:
+        if locked:
+            self.setStyleSheet(
+                "QLineEdit { min-height: 37px; padding: 0 9px; "
+                "color: #30465b; background: #eef3f7; "
+                "border: 1px solid #d9e2ea; border-radius: 8px; }"
+            )
+        else:
+            self.setStyleSheet(
+                "QLineEdit { min-height: 37px; padding: 0 9px; "
+                "color: #102d43; background: #ffffff; "
+                "border: 2px solid #287c9d; border-radius: 8px; }"
+            )
 
     def wheelEvent(self, event):
         event.ignore()
 
 
-class NoWheelDoubleSpinBox(QDoubleSpinBox):
-    """Numeric control that never changes while the user scrolls the panel."""
+class NoWheelSpinBox(_NumericParameterEdit):
+    """Integer recognition parameter that never changes on mouse-wheel scroll."""
 
-    def wheelEvent(self, event):
-        event.ignore()
+    def __init__(self, parent=None):
+        super().__init__(integer=True, parent=parent)
+
+
+class NoWheelDoubleSpinBox(_NumericParameterEdit):
+    """Floating-point recognition parameter with reliable Windows rendering."""
+
+    def __init__(self, parent=None):
+        super().__init__(integer=False, parent=parent)
 
 class NoWheelComboBox(QComboBox):
     """
@@ -412,6 +498,8 @@ class MainWindow(QMainWindow):
         widget.setReadOnly(locked)
         widget.setButtonSymbols(QAbstractSpinBox.NoButtons)
         widget.setProperty("locked", locked)
+        if hasattr(widget, "set_locked_appearance"):
+            widget.set_locked_appearance(locked)
         widget.style().unpolish(widget)
         widget.style().polish(widget)
         if button is not None:
