@@ -325,13 +325,18 @@ jobs:
           $portable = "release\${{ env.PORTABLE_NAME }}"
           $checksums = "release\SHA256SUMS.txt"
 
-          $releaseExists = $false
+          # Do not probe a missing release with `gh release view`: on the
+          # Windows PowerShell runner a normal "release not found" response
+          # is surfaced as an error and aborts the step. Listing releases
+          # succeeds even when there are no releases, so it is safe here.
+          $releasesJson = gh release list --limit 1000 --json tagName
 
-          gh release view $tag 2>$null
-
-          if ($LASTEXITCODE -eq 0) {
-              $releaseExists = $true
+          if ($LASTEXITCODE -ne 0) {
+              throw "Failed to read GitHub Releases."
           }
+
+          $releases = @($releasesJson | ConvertFrom-Json)
+          $releaseExists = @($releases | Where-Object { $_.tagName -eq $tag }).Count -gt 0
 
           if ($releaseExists) {
 
