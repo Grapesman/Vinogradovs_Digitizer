@@ -377,6 +377,33 @@ QDoubleSpinBox:focus {
 }
 
 
+/*
+   QSpinBox/QDoubleSpinBox contain an internal QLineEdit.
+   The generic QLineEdit rule above gives every line edit a 37 px minimum
+   height and its own frame. On Windows (especially with display scaling)
+   that can make the embedded editor taller than the spin box itself,
+   clipping the numeric text completely.
+
+   Keep the outer spin box styled, but make its internal editor frameless
+   and compact so values remain visible on Windows, macOS and Docker/Linux.
+*/
+QSpinBox > QLineEdit,
+QDoubleSpinBox > QLineEdit {
+    min-height: 0px;
+
+    padding: 0px 7px;
+
+    color: #213a51;
+    background: transparent;
+
+    border: none;
+    border-radius: 0px;
+
+    selection-background-color: #24688e;
+    selection-color: #ffffff;
+}
+
+
 /* ============================================================
    ЗАБЛОКИРОВАННЫЕ ЧИСЛОВЫЕ ПАРАМЕТРЫ
    ============================================================ */
